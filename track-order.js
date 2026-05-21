@@ -3,7 +3,7 @@
  * Handles the Track My Order page functionality for the Cara e-commerce project.
  * Resolves GitHub Issue #302
  */
-
+    
 // ── Dynamic copyright year ────────────────────────────────
 const copyrightYearEl = document.getElementById("copyrightYear");
 if (copyrightYearEl) {
