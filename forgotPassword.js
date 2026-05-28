@@ -1,6 +1,9 @@
 /* ===== FORGOT PASSWORD JS ===== */
 
-/* toggle new password visibility */
+document.addEventListener('DOMContentLoaded', function () {
+  if (!document.getElementById('forgotForm')) 
+        return;
+
 document.getElementById('toggleNewPass').addEventListener('click', function () {
   const pwd = document.getElementById('forgotNewPass');
   pwd.type = pwd.type === 'password' ? 'text' : 'password';
@@ -17,7 +20,8 @@ document.getElementById('toggleConfirmPass').addEventListener('click', function 
 });
 
 /* form submit */
-document.getElementById('forgotForm').addEventListener('submit', function (e) {
+const form = document.getElementById('forgotForm');
+if (form) form.addEventListener('submit', function (e) {
   e.preventDefault();
 
   const email       = document.getElementById('forgotEmail').value.trim();
@@ -30,8 +34,33 @@ document.getElementById('forgotForm').addEventListener('submit', function (e) {
     return;
   }
 
-  if (!newPass || newPass.length < 6) {
-    showToast('Password must be at least 6 characters!', 'warning');
+  if (/\s/.test(newPass)) {
+    showToast('Password must not contain spaces.', 'warning');
+    return;
+  }
+
+  if (!newPass || newPass.length < 8) {
+    showToast('Password must be at least 8 characters long.', 'warning');
+    return;
+  }
+
+  if (!/[A-Z]/.test(newPass)) {
+    showToast('Password must contain at least one uppercase letter (A-Z).', 'warning');
+    return;
+  }
+
+  if (!/[a-z]/.test(newPass)) {
+    showToast('Password must contain at least one lowercase letter (a-z).', 'warning');
+    return;
+  }
+
+  if (!/[0-9]/.test(newPass)) {
+    showToast('Password must contain at least one number (0-9).', 'warning');
+    return;
+  }
+
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPass)) {
+    showToast('Password must contain at least one special character (e.g. @, #, $).', 'warning');
     return;
   }
 
@@ -40,24 +69,40 @@ document.getElementById('forgotForm').addEventListener('submit', function (e) {
     return;
   }
 
-  /* check if email exists in localStorage */
-  let users = JSON.parse(localStorage.getItem('users') || '[]');
-  const userIndex = users.findIndex(u => u.email === email);
-
-  if (userIndex === -1) {
-    showToast('No account found with this email!', 'error');
-    return;
+  /* ── Loading state: disable button & show spinner ── */
+  const submitBtn = document.querySelector('#forgotForm button[type="submit"], #forgotForm .btn-primary');
+  if (submitBtn) {
+    submitBtn.classList.add('btn-loading');
+    submitBtn.disabled = true;
   }
 
-  /* update password */
-  users[userIndex].password = newPass;
-  localStorage.setItem('users', JSON.stringify(users));
+  /* Simulate async request */
+  setTimeout(function () {
+    /* check if email exists in localStorage */
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.email === email);
 
-  showToast('Password reset successful! Redirecting to login...', 'success');
+    if (userIndex === -1) {
+      showToast('No account found with this email!', 'error');
+      /* Re-enable button on failure */
+      if (submitBtn) {
+        submitBtn.classList.remove('btn-loading');
+        submitBtn.disabled = false;
+      }
+      return;
+    }
 
-  /* redirect to login after success */
-  setTimeout(() => {
-    window.location.href = 'login.html';
-  }, 2000);
+    /* update password */
+    users[userIndex].password = newPass;
+    localStorage.setItem('users', JSON.stringify(users));
+
+    showToast('Password reset successful! Redirecting to login...', 'success');
+
+    /* redirect to login after success */
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 2000);
+  }, 1500);
 });
-
+});
+

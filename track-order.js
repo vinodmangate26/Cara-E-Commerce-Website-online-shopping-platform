@@ -14,12 +14,12 @@ if (copyrightYearEl) {
 // In a real app this would be a backend API call.
 // We use a demo entry so reviewers can test the UI immediately.
 const MOCK_ORDERS = {
-  "CARA-20251234": {
-    id: "CARA-20251234",
-    date: "May 14, 2025",
+  "CARA-20261234": {
+    id: "CARA-20261234",
+    date: "May 14, 2026",
     carrier: "FedEx Express",
     trackingNo: "7489 2091 3847",
-    estDelivery: "May 20, 2025",
+    estDelivery: "May 20, 2026",
     status: "In Transit",          // "Processing" | "Packed" | "Shipped" | "In Transit" | "Delivered"
     currentStep: "transit",        // ordered | packed | shipped | transit | delivered
     location: "Chicago, IL",
@@ -41,11 +41,11 @@ const MOCK_ORDERS = {
     ],
     total: "$234.00",
     timeline: {
-      ordered: { done: true,  date: "May 14, 2025 — 10:32 AM", note: "Your order has been confirmed and is being processed." },
-      packed:  { done: true,  date: "May 15, 2025 — 2:14 PM",  note: "Your items have been packed and are ready for pickup." },
-      shipped: { done: true,  date: "May 16, 2025 — 9:05 AM",  note: "Your package has been handed off to FedEx Express." },
-      transit: { done: false, date: "May 18, 2025 — 6:45 AM",  note: "Your package is on its way — currently in Chicago, IL.", active: true },
-      delivered:{ done: false,date: "Expected: May 20, 2025",   note: "Your package will be delivered to your door." },
+      ordered: { done: true,  date: "May 14, 2026 — 10:32 AM", note: "Your order has been confirmed and is being processed." },
+      packed:  { done: true,  date: "May 15, 2026 — 2:14 PM",  note: "Your items have been packed and are ready for pickup." },
+      shipped: { done: true,  date: "May 16, 2026 — 9:05 AM",  note: "Your package has been handed off to FedEx Express." },
+      transit: { done: false, date: "May 18, 2026 — 6:45 AM",  note: "Your package is on its way — currently in Chicago, IL.", active: true },
+      delivered:{ done: false,date: "Expected: May 20, 2026",   note: "Your package will be delivered to your door." },
     },
   },
 };
@@ -99,6 +99,13 @@ function setLoading(isLoading) {
 
 // ── Render the result card ────────────────────────────────
 function renderResult(order) {
+  // Save order tracking parameters to localStorage for history retention
+  localStorage.setItem("cara_last_tracked_id", order.id);
+  const emailInput = document.getElementById("orderEmail");
+  if (emailInput) {
+    localStorage.setItem("cara_last_tracked_email", emailInput.value.trim());
+  }
+
   // Populate header
   document.getElementById("resultOrderId").textContent = order.id;
   document.getElementById("statusText").textContent    = order.status;
@@ -112,6 +119,40 @@ function renderResult(order) {
   badge.className = "order-status-badge";
   if (order.status === "Delivered") badge.classList.add("delivered");
   if (order.status === "In Transit") badge.classList.add("in-transit");
+
+  // Dynamic live progress bar tracker (Simulated Distance Cover)
+  let liveContainer = document.getElementById("liveProgressBarWrap");
+  if (!liveContainer) {
+    liveContainer = document.createElement("div");
+    liveContainer.id = "liveProgressBarWrap";
+    liveContainer.style.cssText = "background: rgba(8, 129, 120, 0.08); padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid rgba(8, 129, 120, 0.15);";
+    liveContainer.innerHTML = `
+      <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; font-weight: 600; color: #088178;">
+        <span>Simulated Delivery Progress</span>
+        <span id="liveProgressPercent">62%</span>
+      </div>
+      <div style="background: rgba(0,0,0,0.1); height: 8px; border-radius: 4px; overflow: hidden; position: relative;">
+        <div id="liveProgressBar" style="background: #088178; height: 100%; width: 62%; transition: width 1s linear;"></div>
+      </div>
+      <span style="display: block; font-size: 11px; color: #666; margin-top: 6px; font-style: italic;">Live simulated parcel dispatch tracing active...</span>
+    `;
+    const detailsWrap = document.querySelector(".result-grid");
+    if (detailsWrap) detailsWrap.parentNode.insertBefore(liveContainer, detailsWrap);
+  }
+
+  // Animate simulated progress bar dynamically
+  let currentPct = 62;
+  const progressTimer = setInterval(() => {
+    if (currentPct < 99) {
+      currentPct += (Math.random() * 0.5 + 0.1);
+      const bar = document.getElementById("liveProgressBar");
+      const label = document.getElementById("liveProgressPercent");
+      if (bar) bar.style.width = currentPct.toFixed(1) + "%";
+      if (label) label.textContent = currentPct.toFixed(1) + "%";
+    } else {
+      clearInterval(progressTimer);
+    }
+  }, 3000);
 
   // Populate timeline
   const steps = ["ordered", "packed", "shipped", "transit", "delivered"];
@@ -161,6 +202,18 @@ function renderResult(order) {
   resultCard.style.display = "block";
   resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+
+// Auto-fill tracked order from localStorage if available
+document.addEventListener("DOMContentLoaded", () => {
+  const cachedId = localStorage.getItem("cara_last_tracked_id");
+  const cachedEmail = localStorage.getItem("cara_last_tracked_email");
+  if (cachedId && document.getElementById("orderId")) {
+    document.getElementById("orderId").value = cachedId;
+  }
+  if (cachedEmail && document.getElementById("orderEmail")) {
+    document.getElementById("orderEmail").value = cachedEmail;
+  }
+});
 
 // ── Show error card ───────────────────────────────────────
 function showError() {

@@ -1,18 +1,71 @@
 function loadNavbar(activePage) {
   const navbarHTML = `
+    <div class="nav-search-container">
+      <i class="ri-search-line search-icon"></i>
+      <input type="text" id="searchBar" class="nav-search-input" placeholder="Search products...">
+    </div>
     <div>
       <ul id="navbar">
-        <li><a ${activePage === 'home' ? 'class="active"' : ''} href="index.html">Home</a></li>
-        <li><a ${activePage === 'shop' ? 'class="active"' : ''} href="shop.html">Shop</a></li>
-        <li><a ${activePage === 'blog' ? 'class="active"' : ''} href="blog.html">Blog</a></li>
-        <li><a ${activePage === 'about' ? 'class="active"' : ''} href="about.html">About</a></li>
-        <li><a ${activePage === 'contact' ? 'class="active"' : ''} href="contact.html">Contact</a></li>
-        <li><a ${activePage === 'tryon' ? 'class="active"' : ''} href="try-on.html">Try-On</a></li>
-        <li><a ${activePage === 'community' ? 'class="active"' : ''} href="community.html">Community</a></li>
-        <li><a ${activePage === 'promotions' ? 'class="active"' : ''} href="promotions.html">Promotions</a></li>
-        <li><a ${activePage === 'login' ? 'class="active"' : ''} href="login.html">Login</a></li>
+
         <li>
-          <a href="cart.html" id="lg-bag" class="cart-icon-wrapper">
+          <a ${activePage === 'home' ? 'class="active" aria-current="page"' : ''} href="index.html" title="Home">
+            Home
+          </a>
+        </li>
+
+        <li>
+          <a ${activePage === 'shop' ? 'class="active" aria-current="page"' : ''} href="shop.html" title="Shop">
+            Shop
+          </a>
+        </li>
+
+        <li>
+          <a ${activePage === 'blog' ? 'class="active" aria-current="page"' : ''} href="blog.html" title="Blog">
+            Blog
+          </a>
+        </li>
+
+        <li>
+          <a ${activePage === 'about' ? 'class="active" aria-current="page"' : ''} href="about.html" title="About">
+            About
+          </a>
+        </li>
+
+        <li>
+          <a ${activePage === 'tryon' ? 'class="active" aria-current="page"' : ''} href="try-on.html" title="Try-On">
+            Try-On
+          </a>
+        </li>
+
+        <li>
+          <a ${activePage === 'community' ? 'class="active" aria-current="page"' : ''} href="community.html" title="Community">
+            Community
+          </a>
+        </li>
+
+        <li>
+          <a ${activePage === 'promotions' ? 'class="active" aria-current="page"' : ''} href="promotions.html" title="Promotions">
+            Promotions
+          </a>
+        </li>
+
+        <!-- Contact Icon -->
+        <li class="nav-icon">
+          <a href="contact.html" title="Contact Us" aria-label="Contact">
+            <i class="ri-customer-service-2-line"></i>
+          </a>
+        </li>
+
+        <!-- Login Icon -->
+        <li class="nav-icon">
+          <a ${activePage === 'login' ? 'class="active" aria-current="page"' : ''} href="login.html" title="Sign In" aria-label="Login">
+            <i class="ri-user-3-line"></i>
+          </a>
+        </li>
+
+        <!-- Cart Icon -->
+        <li class="nav-icon">
+          <a href="cart.html" id="lg-bag" title="View Cart" aria-label="Cart">
             <i class="ri-shopping-bag-4-line"></i>
             <span class="cart-count" id="desktopCartCount">0</span>
           </a>
@@ -37,33 +90,4 @@ function loadNavbar(activePage) {
     return;
   }
 
-  initDarkMode();
-}
-
-function initDarkMode() {
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
-  const themeToggleMobile = document.getElementById('themeToggleMobile');
-  const themeIconMobile = document.getElementById('themeIconMobile');
-
-  // Apply saved theme on load
-  const isDarkSaved = localStorage.getItem('theme') === 'dark';
-  if (isDarkSaved) {
-    document.body.classList.add('dark');
-    if (themeIcon) themeIcon.classList.replace('ri-moon-line', 'ri-sun-line');
-    if (themeIconMobile) themeIconMobile.classList.replace('ri-moon-line', 'ri-sun-line');
-  }
-
-  function handleToggle() {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    const next = isDark ? 'ri-sun-line' : 'ri-moon-line';
-    const prev = isDark ? 'ri-moon-line' : 'ri-sun-line';
-    if (themeIcon) themeIcon.classList.replace(prev, next);
-    if (themeIconMobile) themeIconMobile.classList.replace(prev, next);
-  }
-
-  if (themeToggle) themeToggle.addEventListener('click', handleToggle);
-  if (themeToggleMobile) themeToggleMobile.addEventListener('click', handleToggle);
 }
